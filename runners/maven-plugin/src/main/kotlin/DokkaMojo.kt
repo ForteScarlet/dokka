@@ -177,6 +177,9 @@ abstract class AbstractDokkaMojo : AbstractMojo() {
     var generateIndexPages: Boolean = false
 
     @Parameter
+    var failOnWarning: Boolean = false
+
+    @Parameter
     var dokkaPlugins: List<Dependency> = emptyList()
 
     protected abstract fun getOutDir(): String
@@ -263,7 +266,8 @@ abstract class AbstractDokkaMojo : AbstractMojo() {
             pluginsClasspath = getArtifactByAether("org.jetbrains.dokka", "dokka-base", dokkaVersion) +
                     dokkaPlugins.map { getArtifactByAether(it.groupId, it.artifactId, it.version) }.flatten(),
             pluginsConfiguration = mutableMapOf(), //TODO implement as it is in Gradle
-            modules = emptyList()
+            modules = emptyList(),
+            failOnWarning = failOnWarning
         )
 
         val gen = DokkaGenerator(configuration, logger)

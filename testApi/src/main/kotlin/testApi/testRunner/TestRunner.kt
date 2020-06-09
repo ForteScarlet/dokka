@@ -9,6 +9,7 @@ import org.jetbrains.dokka.pages.RootPageNode
 import org.jetbrains.dokka.plugability.DokkaContext
 import org.jetbrains.dokka.plugability.DokkaPlugin
 import org.jetbrains.dokka.utilities.DokkaConsoleLogger
+import org.jetbrains.dokka.utilities.DokkaLogger
 import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.nio.charset.Charset
@@ -19,7 +20,7 @@ import java.nio.file.Paths
 
 // TODO: take dokka configuration from file
 abstract class AbstractCoreTest {
-    protected val logger = DokkaConsoleLogger
+    protected var logger: DokkaLogger = DokkaConsoleLogger
 
     protected fun getTestDataDir(name: String) =
         File("src/test/resources/$name").takeIf { it.exists() }?.toPath()
@@ -141,6 +142,7 @@ abstract class AbstractCoreTest {
         var cacheRoot: String? = null
         var pluginsClasspath: List<File> = emptyList()
         var pluginsConfigurations: Map<String, String> = emptyMap()
+        var failOnWarning: Boolean = false
         private val passesConfigurations = mutableListOf<PassConfigurationImpl>()
         fun build() = DokkaConfigurationImpl(
             outputDir = outputDir,
@@ -151,7 +153,8 @@ abstract class AbstractCoreTest {
             passesConfigurations = passesConfigurations,
             pluginsClasspath = pluginsClasspath,
             pluginsConfiguration = pluginsConfigurations,
-            modules = emptyList()
+            modules = emptyList(),
+            failOnWarning = failOnWarning
         )
 
         fun passes(block: Passes.() -> Unit) {

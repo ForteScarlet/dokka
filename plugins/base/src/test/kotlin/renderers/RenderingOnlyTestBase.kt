@@ -36,7 +36,7 @@ abstract class RenderingOnlyTestBase {
         DokkaBase().externalLocationProviderFactory to { _ -> ::JavadocExternalLocationProviderFactory },
         DokkaBase().externalLocationProviderFactory to { _ -> ::DokkaExternalLocationProviderFactory },
         sourceSetCache = SourceSetCache(),
-        testConfiguration = DokkaConfigurationImpl("", "", false, null, emptyList(), emptyList(), emptyList(), emptyMap(), emptyList())
+        testConfiguration = DokkaConfigurationImpl("", "", false, null, emptyList(), emptyList(), emptyList(), emptyMap(), emptyList(), false)
     )
 
     protected val renderedContent: Element by lazy {

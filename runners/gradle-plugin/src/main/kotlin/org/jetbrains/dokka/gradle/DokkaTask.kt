@@ -93,6 +93,9 @@ open class DokkaTask : DefaultTask(), Configurable {
     @Input
     var disableAutoconfiguration: Boolean = false
 
+    @Input
+    var failOnWarning: Boolean = false
+
     private var outputDiagnosticInfo: Boolean =
         false // Workaround for Gradle, which fires some methods (like collectConfigurations()) multiple times in its lifecycle
 
@@ -199,6 +202,7 @@ open class DokkaTask : DefaultTask(), Configurable {
             passesConfigurations = defaultModulesConfiguration
             pluginsClasspath = pluginsConfig.resolve().toList()
             pluginsConfiguration = this@DokkaTask.pluginsConfiguration
+            failOnWarning = this@DokkaTask.failOnWarning
         }
     }
 

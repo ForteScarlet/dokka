@@ -5,7 +5,6 @@ import org.jetbrains.dokka.analysis.DokkaResolutionFacade
 import org.jetbrains.dokka.model.DModule
 import org.jetbrains.dokka.model.SourceSetCache
 import org.jetbrains.dokka.model.SourceSetData
-import org.jetbrains.dokka.model.sourceSet
 import org.jetbrains.dokka.pages.RootPageNode
 import org.jetbrains.dokka.plugability.DokkaContext
 import org.jetbrains.dokka.plugability.DokkaPlugin
@@ -55,9 +54,7 @@ class DokkaGenerator(
         report("Rendering")
         render(transformedPages, context)
 
-        context.unusedPoints.takeIf { it.isNotEmpty() }
-            ?.also { logger.warn("Unused extension points found: ${it.joinToString(", ")}") }
-        logger.report()
+        reportAfterRendering(context)
     }.dump("\n\n === TIME MEASUREMENT ===\n")
 
     fun generateAllModulesPage() = timed {
@@ -139,6 +136,20 @@ class DokkaGenerator(
         renderer.render(transformedPages)
     }
 
+    fun reportAfterRendering(context: DokkaContext) {
+        context.unusedPoints.takeIf { it.isNotEmpty() }?.also {
+            logger.warn("Unused extension points found: ${it.joinToString(", ")}")
+        }
+
+        logger.report()
+
+        if (context.configuration.failOnWarning && (logger.warningsCount > 0 || logger.errorsCount > 0)) {
+            throw DokkaException(
+                "Failed with warningCount=${logger.warningsCount} and errorCount=${logger.errorsCount}"
+            )
+        }
+    }
+
     private fun createEnvironmentAndFacade(pass: DokkaConfiguration.PassConfiguration): EnvironmentAndFacade =
         AnalysisEnvironment(DokkaMessageCollector(logger), pass.analysisPlatform).run {
             if (analysisPlatform == Platform.jvm) {
@@ -146,7 +157,7 @@ class DokkaGenerator(
             }
             pass.classpath.forEach { addClasspath(File(it)) }
 
-            addSources((pass.sourceRoots +  pass.dependentSourceRoots).map { it.path })
+            addSources((pass.sourceRoots + pass.dependentSourceRoots).map { it.path })
 
             loadLanguageVersionSettings(pass.languageVersion, pass.apiVersion)
 
@@ -205,4 +216,10 @@ private class Timer(startTime: Long, private val logger: DokkaLogger?) {
 }
 
 private fun timed(logger: DokkaLogger? = null, block: Timer.() -> Unit): Timer =
-    Timer(System.currentTimeMillis(), logger).apply(block).apply { report("") }
+    Timer(System.currentTimeMillis(), logger).apply {
+        try {
+            block()
+        } finally {
+            report("")
+        }
+    }

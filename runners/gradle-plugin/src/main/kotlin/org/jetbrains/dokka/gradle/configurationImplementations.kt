@@ -136,6 +136,7 @@ class GradleDokkaConfigurationImpl: DokkaConfiguration {
     override var pluginsClasspath: List<File> = emptyList()
     override var pluginsConfiguration: Map<String, String> = mutableMapOf()
     override var modules: List<GradleDokkaModuleDescription> = emptyList()
+    override var failOnWarning: Boolean = false
 }
 
 class GradlePackageOptionsImpl: PackageOptions, Serializable {

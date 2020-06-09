@@ -48,6 +48,10 @@ open class GlobalArguments(parser: DokkaArgumentsParser) : DokkaConfiguration {
 
     override val impliedPlatforms: List<String> = emptyList()
 
+    override val failOnWarning: Boolean by parser.singleFlag(
+        listOf("-failOnWarning"), "Fail dokka task if at least one warning was reported"
+    )
+
     override val passesConfigurations: List<Arguments> by parser.repeatableFlag(
         listOf("-pass"),
         "Single dokka pass"

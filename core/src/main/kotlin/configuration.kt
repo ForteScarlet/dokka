@@ -34,6 +34,7 @@ interface DokkaConfiguration {
     val impliedPlatforms: List<String>
     val pluginsClasspath: List<File>
     val pluginsConfiguration: Map<String, String>
+    val failOnWarning: Boolean
 
     interface PassConfiguration {
         val moduleName: String
