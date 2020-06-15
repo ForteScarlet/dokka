@@ -416,7 +416,7 @@ object DefaultPsiToDocumentableTranslator : SourceToDocumentableTranslator {
         private fun PsiAnnotationMemberValue.toValue(): AnnotationParameterValue? = when (this) {
             is PsiAnnotation -> toAnnotation()?.let { AnnotationValue(it) }
             is PsiArrayInitializerMemberValue -> ArrayValue(initializers.mapNotNull { it.toValue() })
-            is PsiReferenceExpression -> driOfReference()?.let { EnumValue(text ?: "", DRI.from(it)) }
+            is PsiReferenceExpression -> psiReference?.let { EnumValue(text ?: "", DRI.from(it)) }
             is PsiClassObjectAccessExpression -> ClassValue(
                 text ?: "",
                 DRI.from(((type as PsiImmediateClassType).parameters.single() as PsiClassReferenceType).resolve()!!)
@@ -424,7 +424,7 @@ object DefaultPsiToDocumentableTranslator : SourceToDocumentableTranslator {
             else -> StringValue(text ?: "")
         }
 
-        private fun PsiAnnotation.toAnnotation() = driOfReference()?.let {
+        private fun PsiAnnotation.toAnnotation() = psiReference?.let {
             Annotations.Annotation(
                 DRI.from(it),
                 attributes.filter { it !is KtLightAbstractAnnotation }.mapNotNull { it.attributeName to it.toValue() }
@@ -435,6 +435,7 @@ object DefaultPsiToDocumentableTranslator : SourceToDocumentableTranslator {
             )
         }
 
-        private fun PsiElement.driOfReference() = getChildOfType<PsiJavaCodeReferenceElement>()?.resolve()
+        private val PsiElement.psiReference
+            get() = getChildOfType<PsiJavaCodeReferenceElement>()?.resolve()
     }
 }
