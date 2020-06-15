@@ -350,18 +350,7 @@ open class PageContentBuilder(
             sourceSets: Set<SourceSetData>,
             styles: Set<Style>,
             extra: PropertyContainer<ContentNode>
-        ) =
-            ContentText(text, DCI(mainDRI, kind), sourceSets, styles, extra)
-
-        fun <T> platformText(
-            value: SourceSetDependent<T>,
-            platforms: Set<SourceSetData> = value.keys,
-            transform: (T) -> String
-        ) = value.entries.filter { it.key in platforms }.mapNotNull { (p, v) ->
-            transform(v).takeIf { it.isNotBlank() }?.let { it to p }
-        }.groupBy({ it.first }) { it.second }.forEach {
-            text(it.key, sourceSets = it.value.toSet())
-        }
+        ) = ContentText(text, DCI(mainDRI, kind), sourceSets, styles, extra)
     }
 
     @ContentBuilderMarker
